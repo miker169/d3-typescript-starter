@@ -1,58 +1,49 @@
+// Very simple bar chart
+
 import 'bootstrap/dist/css/bootstrap.css';
 import '../style.css';
-import { select, csv, selectAll } from 'd3';
+import { json, select, scaleLinear, scaleBand } from 'd3';
 
-const data = csv('../data/ages.csv')
-.then((data) => {
-  
-  data.forEach(function(d) {
-    d.age = +d.age;
-  });
-  console.log(personData);
+class Building{
+    height: number;
+    constructor(public name: string, h: string) {
+        this.height = +h;
+    }
+}
 
+json('../data/buildings.json')
+.then(data => {
+    const buildingData: Building[] = data.map((x: { name: string; height: string; })  => new Building(x.name, x.height));
 
-const svg = select('#chart-area').append('svg')
-      .attr('width', 400)
-      .attr('height', 400);
+    const x = scaleBand()
+        .domain(["Burj Khalifa", "Shanghai Tower","Abraj Al-Bait Clock Tower",
+            "Ping An Finance Centre", "Lotte World Tower",
+            "One World Trade Center", "Guangzhou CTF Finance Center"
+        ])
+        .range([0, 400])
+        .paddingInner(0.3)
+        .paddingOuter(0.3);
 
-const circles = selectAll('circle')
-  .data(personData);
+    console.log(x('Burj Khalifa'))
 
-circles.enter()
-    .append('circle')
-      .attr('cx', (d: Person, i: number) => {
-        return (d.age * 50) + 25
-      })
-      .attr('cy', 25)
-      .attr('r', (d: number ) => {
-        return d;
-      })
-      .attr('fill', 'red');
+    const y = scaleLinear()
+        .domain([0,  828])
+        .range([0, 400]);
 
-//circles.enter()
-//    .append('circle')
-//      .attr('cx', (d: number, i: number) => {
-//        return 25;
-//      })
-//      .attr('cy', 25)
-//      .attr('r', (d: number) => {
-//        return d;
-//      })
-//      .attr('fill', 'red');
-//
+    const svg = select('#chart-area').append('svg')
+        .attr('height', 400)
+        .attr('width', 400);
+
+    const rects = svg.selectAll('rect').data(buildingData)
+        .enter()
+        .append('rect')
+        .attr('y', 20)
+        .attr('x', (d: Building ) => {
+            return <number>x(d.name)
+        })
+        .attr('height', (d: Building) => {
+            return y(d.height);
+        })
+        .attr('width', x.bandwidth)
+        .attr('fill', 'grey')
 });
-
-
-//console.log(data);
-//const svg = select('#chart-area')
-//  .append('svg')
-//  .attr('width', 400)
-//  .attr('height', 400);
-
-
-//const circles = svg.selectAll('circle')
-//      .data(data);
-//
-//
-
-
