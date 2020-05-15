@@ -2,6 +2,7 @@
 
 import 'bootstrap/dist/css/bootstrap.css';
 import '../style.css';
+
 import { select, csv, selectAll } from 'd3';
 
 class Person{
